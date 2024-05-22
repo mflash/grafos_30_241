@@ -52,7 +52,7 @@ if __name__ == "__main__":
     g.addEdge("0", "2")
     g.addEdge("2", "1")
 
-    g = Graph("tinyG.txt")
+    # g = Graph("tinyG.txt")
 
     for v in g.getVerts():
         print(f"{v}: ", end="")
