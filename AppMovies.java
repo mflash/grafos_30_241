@@ -7,8 +7,9 @@ public class AppMovies
 		String nomes[] = s.split(",");
 		if (nomes.length == 1)
 			return s;
-		String result = nomes[1] + " " + nomes[0];
-		return result.trim();
+		//substitui parenteses por espaços vazios e depois os corta com .trim()	
+		String result = nomes[1].replaceAll("\\(.*?\\)", "").trim() + " " + nomes[0].replaceAll("\\(.*?\\)", "").trim();
+		return result;
 	}
 
 	public static void main(String[] args) {
