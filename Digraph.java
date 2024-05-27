@@ -29,7 +29,7 @@ public class Digraph extends Graph {
     sb.append("node [shape = circle];" + NEWLINE);
     for (String v : getVerts().stream().sorted().toList())
       for (String w : getAdj(v))
-        sb.append(v + " -> " + w + NEWLINE);
+        sb.append("\"" + v + "\"" + " -> " + "\"" + w + "\"" + NEWLINE);
     sb.append("}" + NEWLINE);
     return sb.toString();
   }
