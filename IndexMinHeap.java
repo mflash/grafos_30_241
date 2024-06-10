@@ -202,7 +202,7 @@ public class IndexMinHeap<Key, Value extends Comparable<Value>> {
     h.insert("F", 1.0);
     h.insert("L", 0.0);
 
-    h.decreaseValue("O", -2.0);
+    h.decreaseValue("G", -2.0);
 
     while (h.size() > 0) {
       System.out.println(h.delMin());
