@@ -28,12 +28,38 @@ public class FloydWarshall {
     dist = new double[V][V]; // inicialize todos com Double.POSITIVE_INFINITY
     next = new int[V][V]; // inicialize todos com -1
 
+    for (int i = 0; i < V; i++) {
+      for (int j = 0; j < V; j++) {
+        dist[i][j] = Double.POSITIVE_INFINITY;
+        next[i][j] = -1;
+      }
+    }
+
+    for (Edge e : g.getDigraph().getEdges()) {
+      int u = g.mapToArray(e.getV());
+      int v = g.mapToArray(e.getW());
+      double weight = e.getWeight();
+      dist[u][v] = weight;
+      next[u][v] = v;
+    }
+
     // Comeco do algoritmo...
     startTime = System.currentTimeMillis();
 
     // Loop de Floyd-Warshall
     for (int k = 0; k < V; k++) {
-        // ...
+      for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+          if (dist[i][j] > dist[i][k] + dist[k][j]) {
+            dist[i][j] = dist[i][k] + dist[k][j];
+            next[i][j] = next[i][k];
+          }
+        }
+        if (dist[i][i] < 0) {
+          temCicloNegativo = true;
+          return;
+        }
+      }
     }
 
     // Fim do algoritmo
@@ -62,7 +88,9 @@ public class FloydWarshall {
    * @return {@code true} se existe um caminho
    */
   public boolean temCaminho(String s, String t) {
-    return true;
+    int u = g.mapToArray(s);
+    int v = g.mapToArray(t);
+    return dist[u][v] != Double.POSITIVE_INFINITY;
   }
 
   /**
@@ -76,7 +104,9 @@ public class FloydWarshall {
    * @throws UnsupportedOperationException se existir um ciclo negativo
    */
   public double dist(String s, String t) {
-    return -1;
+    int u = g.mapToArray(s);
+    int v = g.mapToArray(t);
+    return dist[u][v];
   }
 
   /**
@@ -95,6 +125,19 @@ public class FloydWarshall {
       return null;
     List<String> lista = new ArrayList<>();
     // Monte e retorne o caminho
+    int u1 = g.mapToArray(u);
+    int v1 = g.mapToArray(v);
+
+    if (next[u1][v1] == -1)
+      return lista;
+
+    lista.add(v);
+    while (u1 != v1) {
+      // System.out.println("Em " + v);
+      v1 = next[u1][v1];
+      v = g.mapToString(v1);
+      lista.add(0, v);
+    }
     return lista;
   }
 
