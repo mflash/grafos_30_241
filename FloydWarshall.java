@@ -9,7 +9,7 @@ public class FloydWarshall {
   private static final String NEWLINE = System.getProperty("line.separator");
   private boolean temCicloNegativo; // tem ciclo negativo?
   private double[][] dist; // dist[v][w] = distancia do caminho mais curto de v->w
-  private int[][] next; // next[v][w] = ultima aresta no caminho mais curto de v->w
+  private int[][] prev; // prev[v][w] = ultima aresta no caminho mais curto de v->w
   private AdjMatrixEdgeWeightedDigraph g;
 
   private long startTime, endTime;
@@ -26,12 +26,17 @@ public class FloydWarshall {
     int V = g.getTotalVertices();
     this.g = g;
     dist = new double[V][V]; // inicialize todos com Double.POSITIVE_INFINITY
-    next = new int[V][V]; // inicialize todos com -1
+    prev = new int[V][V]; // inicialize todos com -1
 
     for (int i = 0; i < V; i++) {
       for (int j = 0; j < V; j++) {
         dist[i][j] = Double.POSITIVE_INFINITY;
-        next[i][j] = -1;
+        if (i == j) {
+          dist[i][i] = 0;
+          prev[i][i] = i;
+        } else {
+          prev[i][j] = -1;
+        }
       }
     }
 
@@ -40,7 +45,7 @@ public class FloydWarshall {
       int v = g.mapToArray(e.getW());
       double weight = e.getWeight();
       dist[u][v] = weight;
-      next[u][v] = v;
+      prev[u][v] = u;
     }
 
     // Comeco do algoritmo...
@@ -52,7 +57,7 @@ public class FloydWarshall {
         for (int j = 0; j < V; j++) {
           if (dist[i][j] > dist[i][k] + dist[k][j]) {
             dist[i][j] = dist[i][k] + dist[k][j];
-            next[i][j] = next[i][k];
+            prev[i][j] = prev[k][j];
           }
         }
         if (dist[i][i] < 0) {
@@ -88,9 +93,7 @@ public class FloydWarshall {
    * @return {@code true} se existe um caminho
    */
   public boolean temCaminho(String s, String t) {
-    int u = g.mapToArray(s);
-    int v = g.mapToArray(t);
-    return dist[u][v] != Double.POSITIVE_INFINITY;
+    return dist(s, t) != Double.POSITIVE_INFINITY;
   }
 
   /**
@@ -128,13 +131,10 @@ public class FloydWarshall {
     int u1 = g.mapToArray(u);
     int v1 = g.mapToArray(v);
 
-    if (next[u1][v1] == -1)
-      return lista;
-
     lista.add(v);
     while (u1 != v1) {
       // System.out.println("Em " + v);
-      v1 = next[u1][v1];
+      v1 = prev[u1][v1];
       v = g.mapToString(v1);
       lista.add(0, v);
     }
@@ -144,11 +144,40 @@ public class FloydWarshall {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("Distâncias:" + NEWLINE);
+    sb.append("  ");
     for (int i = 0; i < dist.length; i++) {
+      String v = g.mapToString(i);
+      sb.append(String.format("%-5s ", v));
+    }
+    sb.append(NEWLINE);
+    for (int i = 0; i < dist.length; i++) {
+      String v = g.mapToString(i);
+      sb.append(v + " ");
       for (int j = 0; j < dist[i].length; j++) {
-        if (next[i][j] != -1)
+        if (prev[i][j] != -1)
           sb.append(String.format("%5.2f ", dist[i][j]));
         else
+          sb.append("----- ");
+      }
+      sb.append(NEWLINE);
+    }
+    // Ligações
+    sb.append(NEWLINE + "Ligações:" + NEWLINE);
+    sb.append("  ");
+    for (int i = 0; i < prev.length; i++) {
+      String v = g.mapToString(i);
+      sb.append(String.format("%-5s ", v));
+    }
+    sb.append(NEWLINE);
+    for (int i = 0; i < prev.length; i++) {
+      String v = g.mapToString(i);
+      sb.append(v + " ");
+      for (int j = 0; j < prev[i].length; j++) {
+        if (prev[i][j] != -1) {
+          String w = g.mapToString(prev[i][j]);
+          sb.append(String.format("%-5s ", w));
+        } else
           sb.append("----- ");
       }
       sb.append(NEWLINE);
@@ -181,18 +210,20 @@ public class FloydWarshall {
 
     Set<String> verts = g.getVerts();
     // Exibe mensagem se houver ciclo negativo
-    if (fw.temCicloNegativo()) {
-      System.out.println("Existe um ciclo negativo!");
-    } else {
-      // Exibe todos os caminhos
-      for (String u : verts) {
-        for (String v : verts) {
-          if (u != v && fw.temCaminho(u, v)) {
-            System.out.print(u + "->" + v + ": ");
-            for (String x : fw.caminho(u, v)) {
-              System.out.print(x + " ");
+    if (true) {
+      if (fw.temCicloNegativo()) {
+        System.out.println("Existe um ciclo negativo!");
+      } else {
+        // Exibe todos os caminhos
+        for (String u : verts) {
+          for (String v : verts) {
+            if (u != v && fw.temCaminho(u, v)) {
+              System.out.print(u + "->" + v + ": ");
+              for (String x : fw.caminho(u, v)) {
+                System.out.print(x + " ");
+              }
+              System.out.println();
             }
-            System.out.println();
           }
         }
       }

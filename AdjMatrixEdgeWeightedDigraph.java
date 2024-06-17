@@ -138,7 +138,15 @@ public class AdjMatrixEdgeWeightedDigraph {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
+    sb.append("  ");
     for (int i = 0; i < adj.length; i++) {
+      String v = mapToString(i);
+      sb.append(String.format("%-5s ", v));
+    }
+    sb.append(NEWLINE);
+    for (int i = 0; i < adj.length; i++) {
+      String v = mapToString(i);
+      sb.append(v + " ");
       for (int j = 0; j < adj[i].length; j++) {
         if (adj[i][j] != null)
           sb.append(String.format("%5.2f ", adj[i][j].getWeight()));
